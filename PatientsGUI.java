@@ -73,6 +73,9 @@ public class PatientsGUI {
 					}
 					if (count==1){
 						JOptionPane.showMessageDialog(null,"Username and password is correct");
+						frame.dispose();
+						PatientInfoGUI patientInfo=new PatientInfoGUI();
+						patientInfo.setVisible(true);
 					}else if(count>1){
 						JOptionPane.showMessageDialog(null,"Duplicate username and password");
 					}else{
