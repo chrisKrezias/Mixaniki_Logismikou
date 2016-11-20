@@ -38,6 +38,9 @@ public class PatientInfoGUI extends JFrame {
 	}
 
 	Connection connection=null;
+	private JTextField IDtext;
+	private JTextField Nametext;
+	private JTextField Surnametext;
 	/**
 	 * Create the frame.
 	 */
@@ -54,17 +57,21 @@ public class PatientInfoGUI extends JFrame {
 		PatientInfo.setBounds(10, 11, 66, 14);
 		contentPane.add(PatientInfo);
 		
+		//log out from patient info window button
 		JButton btnLogOut = new JButton("Log Out");
 		btnLogOut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				//close the patient info window
 				contentPane.setVisible(false);
 				dispose();
+				//load the main application again
 				PatientsGUI.main(null);
 			}
 		});
 		btnLogOut.setBounds(10, 302, 89, 23);
 		contentPane.add(btnLogOut);
 		
+		//show patient info from the database button by executing query
 		JButton btnShowInfo = new JButton("Show Info");
 		btnShowInfo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -72,7 +79,10 @@ public class PatientInfoGUI extends JFrame {
 					String piquery="select * from PatientsInfo";
 					PreparedStatement pipst=connection.prepareStatement(piquery);
 					ResultSet pirs=pipst.executeQuery();
+					//show data on JTable
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
+					pipst.close();
+					pirs.close();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -87,5 +97,55 @@ public class PatientInfoGUI extends JFrame {
 		
 		table = new JTable();
 		scrollPane.setViewportView(table);
+		
+		JLabel lblId = new JLabel("ID");
+		lblId.setBounds(10, 36, 46, 14);
+		contentPane.add(lblId);
+		
+		IDtext = new JTextField();
+		IDtext.setBounds(10, 61, 86, 20);
+		contentPane.add(IDtext);
+		IDtext.setColumns(10);
+		
+		JLabel lblName = new JLabel("Name");
+		lblName.setBounds(10, 92, 46, 14);
+		contentPane.add(lblName);
+		
+		Nametext = new JTextField();
+		Nametext.setBounds(10, 117, 86, 20);
+		contentPane.add(Nametext);
+		Nametext.setColumns(10);
+		
+		JLabel lblSurname = new JLabel("Surname");
+		lblSurname.setBounds(10, 148, 46, 14);
+		contentPane.add(lblSurname);
+		
+		Surnametext = new JTextField();
+		Surnametext.setBounds(10, 173, 86, 20);
+		contentPane.add(Surnametext);
+		Surnametext.setColumns(10);
+		
+		//save patient info to the database button by executing query
+		JButton btnSave = new JButton("Save");
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					String piquery="insert into PatientsInfo (ID,Name,Surname) values (?,?,?)";
+					PreparedStatement pipst=connection.prepareStatement(piquery);
+					//read data from text fields
+					pipst.setString(1,IDtext.getText());
+					pipst.setString(2,Nametext.getText());
+					pipst.setString(3,Surnametext.getText());
+					pipst.execute();
+					//show confirmation message
+					JOptionPane.showMessageDialog(null,"Patient Info Saved");
+					pipst.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		btnSave.setBounds(10, 268, 89, 23);
+		contentPane.add(btnSave);
 	}
 }

@@ -58,27 +58,36 @@ public class PatientsGUI {
 		frame.getContentPane().add(NameText);
 		NameText.setColumns(10);
 		
+		//log in to the patient info window button by executing query that checks info to the database
 		JButton LoginButton = new JButton("Login");
 		LoginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
 					String loginquery="select * from StaffInfo where Username=? and Password=? ";
 					PreparedStatement loginpst=connection.prepareStatement(loginquery);
+					//read info from text fields
 					loginpst.setString(1, NameText.getText());
 					loginpst.setString(2, PasswordText.getText());
 					ResultSet loginrs=loginpst.executeQuery();
+					//checking the database for unique, double or no info
 					int count=0;
 					while(loginrs.next()){
 						count++;
 					}
+					//actions for unique
 					if (count==1){
 						JOptionPane.showMessageDialog(null,"Username and password is correct");
+						//close main application window and open patient info window
 						frame.dispose();
 						PatientInfoGUI patientInfo=new PatientInfoGUI();
 						patientInfo.setVisible(true);
-					}else if(count>1){
+					}
+					//actions for double
+					else if(count>1){
 						JOptionPane.showMessageDialog(null,"Duplicate username and password");
-					}else{
+					}
+					//action for non existent
+					else{
 						JOptionPane.showMessageDialog(null,"Username and password is not correct");
 					}
 					loginrs.close();
