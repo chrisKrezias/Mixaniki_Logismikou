@@ -3,6 +3,7 @@ import javax.swing.*;
 
 public class sqliteConnection {
 	Connection conn=null;
+	//connect to database script
 	public static Connection dbConnector(){
 		try{
 			Class.forName("org.sqlite.JDBC");
