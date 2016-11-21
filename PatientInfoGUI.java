@@ -166,5 +166,24 @@ public class PatientInfoGUI extends JFrame {
 		});
 		btnUpdate.setBounds(109, 350, 89, 23);
 		contentPane.add(btnUpdate);
+		
+		//delete patient info to the database button by executing query
+		JButton btnDelete = new JButton("Delete");
+		btnDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					String piquery="Delete from PatientsInfo where ID='"+IDtext.getText()+"'";
+					PreparedStatement pipst=connection.prepareStatement(piquery);
+					pipst.execute();
+					//show confirmation message
+					JOptionPane.showMessageDialog(null,"Patient Info Deleted");
+					pipst.close();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		btnDelete.setBounds(208, 350, 89, 23);
+		contentPane.add(btnDelete);
 	}
 }
