@@ -47,7 +47,7 @@ public class PatientInfoGUI extends JFrame {
 	public PatientInfoGUI() {
 		connection=sqliteConnection.dbConnector();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 500, 375);
+		setBounds(100, 100, 635, 457);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -68,7 +68,7 @@ public class PatientInfoGUI extends JFrame {
 				PatientsGUI.main(null);
 			}
 		});
-		btnLogOut.setBounds(10, 302, 89, 23);
+		btnLogOut.setBounds(10, 384, 89, 23);
 		contentPane.add(btnLogOut);
 		
 		//show patient info from the database button by executing query
@@ -92,36 +92,36 @@ public class PatientInfoGUI extends JFrame {
 		contentPane.add(btnShowInfo);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(113, 43, 361, 282);
+		scrollPane.setBounds(170, 43, 439, 290);
 		contentPane.add(scrollPane);
 		
 		table = new JTable();
 		scrollPane.setViewportView(table);
 		
 		JLabel lblId = new JLabel("ID");
-		lblId.setBounds(10, 36, 46, 14);
+		lblId.setBounds(10, 44, 46, 14);
 		contentPane.add(lblId);
 		
 		IDtext = new JTextField();
-		IDtext.setBounds(10, 61, 86, 20);
+		IDtext.setBounds(66, 41, 86, 20);
 		contentPane.add(IDtext);
 		IDtext.setColumns(10);
 		
 		JLabel lblName = new JLabel("Name");
-		lblName.setBounds(10, 92, 46, 14);
+		lblName.setBounds(10, 75, 46, 14);
 		contentPane.add(lblName);
 		
 		Nametext = new JTextField();
-		Nametext.setBounds(10, 117, 86, 20);
+		Nametext.setBounds(66, 72, 86, 20);
 		contentPane.add(Nametext);
 		Nametext.setColumns(10);
 		
 		JLabel lblSurname = new JLabel("Surname");
-		lblSurname.setBounds(10, 148, 46, 14);
+		lblSurname.setBounds(10, 106, 46, 14);
 		contentPane.add(lblSurname);
 		
 		Surnametext = new JTextField();
-		Surnametext.setBounds(10, 173, 86, 20);
+		Surnametext.setBounds(66, 103, 86, 20);
 		contentPane.add(Surnametext);
 		Surnametext.setColumns(10);
 		
@@ -145,7 +145,26 @@ public class PatientInfoGUI extends JFrame {
 				}
 			}
 		});
-		btnSave.setBounds(10, 268, 89, 23);
+		btnSave.setBounds(10, 350, 89, 23);
 		contentPane.add(btnSave);
+		
+		//update patient info to the database button by executing query
+		JButton btnUpdate = new JButton("Update");
+		btnUpdate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					String piquery="Update PatientsInfo set Name='"+Nametext.getText()+"',Surname='"+Surnametext.getText()+"' where ID='"+IDtext.getText()+"'";
+					PreparedStatement pipst=connection.prepareStatement(piquery);
+					pipst.execute();
+					//show confirmation message
+					JOptionPane.showMessageDialog(null,"Patient Info Updated");
+					pipst.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		btnUpdate.setBounds(109, 350, 89, 23);
+		contentPane.add(btnUpdate);
 	}
 }
