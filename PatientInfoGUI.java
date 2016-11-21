@@ -103,7 +103,7 @@ public class PatientInfoGUI extends JFrame {
 				}
 			}
 		});
-		btnShowInfo.setBounds(385, 7, 89, 23);
+		btnShowInfo.setBounds(520, 7, 89, 23);
 		contentPane.add(btnShowInfo);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -203,5 +203,31 @@ public class PatientInfoGUI extends JFrame {
 		});
 		btnDelete.setBounds(208, 350, 89, 23);
 		contentPane.add(btnDelete);
+		
+		JButton btnSearch = new JButton("Search");
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					String piquery="select * from PatientsInfo where ID='"+IDtext.getText()+"' OR (Name='"+Nametext.getText()+"' AND Surname='"+Surnametext.getText()+"')";
+					if (IDtext.getText().isEmpty()){
+						if (Nametext.getText().isEmpty()){
+							piquery="select * from PatientsInfo where Surname='"+Surnametext.getText()+"'";
+						} else if(Surnametext.getText().isEmpty()){
+							piquery="select * from PatientsInfo where Name='"+Nametext.getText()+"'";
+						}
+					}
+					PreparedStatement pipst=connection.prepareStatement(piquery);
+					ResultSet pirs=pipst.executeQuery();
+					//show data on JTable
+					table.setModel(DbUtils.resultSetToTableModel(pirs));
+					pipst.close();
+					pirs.close();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		btnSearch.setBounds(422, 7, 89, 23);
+		contentPane.add(btnSearch);
 	}
 }
