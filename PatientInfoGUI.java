@@ -41,6 +41,21 @@ public class PatientInfoGUI extends JFrame {
 	private JTextField IDtext;
 	private JTextField Nametext;
 	private JTextField Surnametext;
+	
+	//function that uses "show info" code to refresh the table when an action is triggered
+	public void refreshTable(){
+		try {
+			String piquery="select * from PatientsInfo";
+			PreparedStatement pipst=connection.prepareStatement(piquery);
+			ResultSet pirs=pipst.executeQuery();
+			//show data on JTable
+			table.setModel(DbUtils.resultSetToTableModel(pirs));
+			pipst.close();
+			pirs.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	/**
 	 * Create the frame.
 	 */
@@ -140,6 +155,7 @@ public class PatientInfoGUI extends JFrame {
 					//show confirmation message
 					JOptionPane.showMessageDialog(null,"Patient Info Saved");
 					pipst.close();
+					refreshTable();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -159,6 +175,7 @@ public class PatientInfoGUI extends JFrame {
 					//show confirmation message
 					JOptionPane.showMessageDialog(null,"Patient Info Updated");
 					pipst.close();
+					refreshTable();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -178,6 +195,7 @@ public class PatientInfoGUI extends JFrame {
 					//show confirmation message
 					JOptionPane.showMessageDialog(null,"Patient Info Deleted");
 					pipst.close();
+					refreshTable();
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
