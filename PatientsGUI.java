@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 public class PatientsGUI {
 
 	private JFrame frame;
+	private static int prof=0;
 
 	/**
 	 * Launch the application.
@@ -41,20 +42,22 @@ public class PatientsGUI {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 500, 375);
+		frame.setBounds(100, 100, 141, 249);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
-		JLabel NameLabel = new JLabel("Name");
-		NameLabel.setBounds(10, 11, 46, 14);
+		JLabel NameLabel = new JLabel("Username");
+		NameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		NameLabel.setBounds(20, 11, 86, 14);
 		frame.getContentPane().add(NameLabel);
 		
 		JLabel PasswordLabel = new JLabel("Password");
-		PasswordLabel.setBounds(10, 77, 46, 14);
+		PasswordLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		PasswordLabel.setBounds(20, 77, 86, 14);
 		frame.getContentPane().add(PasswordLabel);
 		
 		NameText = new JTextField();
-		NameText.setBounds(10, 36, 86, 20);
+		NameText.setBounds(20, 36, 86, 20);
 		frame.getContentPane().add(NameText);
 		NameText.setColumns(10);
 		
@@ -77,6 +80,11 @@ public class PatientsGUI {
 					//actions for unique
 					if (count==1){
 						JOptionPane.showMessageDialog(null,"Username and password is correct");
+						loginpst.close();
+						loginquery="select Prof from StaffInfo where Username='"+NameText.getText()+"' and Password='"+PasswordText.getText()+"' ";
+						loginpst=connection.prepareStatement(loginquery);
+						loginrs=loginpst.executeQuery();
+						prof=loginrs.getInt("Prof");
 						//close main application window and open patient info window
 						frame.dispose();
 						PatientInfoGUI patientInfo=new PatientInfoGUI();
@@ -97,11 +105,25 @@ public class PatientsGUI {
 				}
 			}
 		});
-		LoginButton.setBounds(10, 133, 89, 23);
+		LoginButton.setBounds(20, 143, 89, 23);
 		frame.getContentPane().add(LoginButton);
 		
 		PasswordText = new JPasswordField();
-		PasswordText.setBounds(10, 102, 86, 20);
+		PasswordText.setBounds(20, 102, 86, 20);
 		frame.getContentPane().add(PasswordText);
+		
+		JButton btnExit = new JButton("Exit");
+		btnExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.exit(0);
+			}
+		});
+		btnExit.setBounds(20, 177, 89, 23);
+		frame.getContentPane().add(btnExit);
+	}
+
+	public static int profint() {
+		// TODO Auto-generated method stub
+		return prof;
 	}
 }
