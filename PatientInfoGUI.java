@@ -26,6 +26,8 @@ public class PatientInfoGUI extends JFrame {
 	/**
 	 * Launch the application.
 	 */
+	public int prof = PatientsGUI.profint();
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -47,6 +49,10 @@ public class PatientInfoGUI extends JFrame {
 	private JTextField Datetext;
 	private JTextField Entrytext;
 	public int indicator=0;
+	private JTextField Addresstext;
+	private JTextField Teltext;
+	private JTextField Birthtext;
+	private JTextField mailtext;
 	
 	//function that uses "show info" code to refresh the table when an action is triggered
 	public void refreshTable(){
@@ -148,6 +154,10 @@ public class PatientInfoGUI extends JFrame {
 							IDtext.setText(pirs.getString("ID"));
 							Nametext.setText(pirs.getString("Name"));
 							Surnametext.setText(pirs.getString("Surname"));
+							Addresstext.setText(pirs.getString("Address"));
+							Teltext.setText(pirs.getString("Tel"));
+							Birthtext.setText(pirs.getString("Date"));
+							mailtext.setText(pirs.getString("mail"));
 						}
 						pipst.close();
 						Entrytext.setText("");
@@ -177,6 +187,10 @@ public class PatientInfoGUI extends JFrame {
 						while(pirs.next()){
 							Nametext.setText(pirs.getString("Name"));
 							Surnametext.setText(pirs.getString("Surname"));
+							Addresstext.setText(pirs.getString("Address"));
+							Teltext.setText(pirs.getString("Tel"));
+							Birthtext.setText(pirs.getString("Date"));
+							mailtext.setText(pirs.getString("mail"));
 						}
 						pipst.close();
 					}catch(Exception e){
@@ -187,7 +201,7 @@ public class PatientInfoGUI extends JFrame {
 		});
 		scrollPane.setViewportView(table);
 		
-		JLabel lblId = new JLabel("ID");
+		JLabel lblId = new JLabel("\u0391\u039C\u039A\u0391");
 		lblId.setBounds(10, 44, 46, 14);
 		contentPane.add(lblId);
 		
@@ -219,12 +233,16 @@ public class PatientInfoGUI extends JFrame {
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					String piquery="insert into PatientsInfo (ID,Name,Surname) values (?,?,?)";
+					String piquery="insert into PatientsInfo (ID,Name,Surname,Address,Tel,Date,mail) values (?,?,?,?,?,?,?)";
 					PreparedStatement pipst=connection.prepareStatement(piquery);
 					//read data from text fields
 					pipst.setString(1,IDtext.getText());
 					pipst.setString(2,Nametext.getText());
 					pipst.setString(3,Surnametext.getText());
+					pipst.setString(4,Addresstext.getText());
+					pipst.setString(5,Teltext.getText());
+					pipst.setString(6,Birthtext.getText());
+					pipst.setString(7,mailtext.getText());
 					pipst.execute();
 					//show confirmation message
 					JOptionPane.showMessageDialog(null,"Patient Info Saved");
@@ -243,7 +261,7 @@ public class PatientInfoGUI extends JFrame {
 		btnUpdate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					String piquery="Update PatientsInfo set Name='"+Nametext.getText()+"',Surname='"+Surnametext.getText()+"' where ID='"+IDtext.getText()+"'";
+					String piquery="Update PatientsInfo set Name='"+Nametext.getText()+"',Surname='"+Surnametext.getText()+"',Address='"+Addresstext.getText()+"',Tel='"+Teltext.getText()+"',Date='"+Birthtext.getText()+"',mail='"+mailtext.getText()+"' where ID='"+IDtext.getText()+"'";
 					PreparedStatement pipst=connection.prepareStatement(piquery);
 					pipst.execute();
 					//show confirmation message
@@ -416,7 +434,7 @@ public class PatientInfoGUI extends JFrame {
 				int action=JOptionPane.showConfirmDialog(null,"Delete confirmation","Delete",JOptionPane.YES_NO_OPTION);
 				if (action==0){
 					try {
-						String piquery="Delete from PatienFolder where Num='"+Entrytext.getText()+"'";
+						String piquery="Delete from PatientFolder where Num='"+Entrytext.getText()+"'";
 						PreparedStatement pipst=connection.prepareStatement(piquery);
 						pipst.execute();
 						//show confirmation message
@@ -442,7 +460,7 @@ public class PatientInfoGUI extends JFrame {
 		contentPane.add(lblNum);
 		
 		JLabel lblPatientFolder = new JLabel("Patient Folder");
-		lblPatientFolder.setBounds(10, 354, 89, 14);
+		lblPatientFolder.setBounds(10, 380, 89, 14);
 		contentPane.add(lblPatientFolder);
 		
 		JLabel lblMaxNum = new JLabel("Max Num");
@@ -465,5 +483,54 @@ public class PatientInfoGUI extends JFrame {
 			ex.printStackTrace();
 		}
 		contentPane.add(lblShownum);
+		
+		Addresstext = new JTextField();
+		Addresstext.setBounds(66, 134, 86, 20);
+		contentPane.add(Addresstext);
+		Addresstext.setColumns(10);
+		
+		Teltext = new JTextField();
+		Teltext.setBounds(66, 165, 86, 20);
+		contentPane.add(Teltext);
+		Teltext.setColumns(10);
+		
+		Birthtext = new JTextField();
+		Birthtext.setText("dd/mm/yyyy");
+		Birthtext.setBounds(66, 196, 86, 20);
+		contentPane.add(Birthtext);
+		Birthtext.setColumns(10);
+		
+		mailtext = new JTextField();
+		mailtext.setBounds(66, 227, 86, 20);
+		contentPane.add(mailtext);
+		mailtext.setColumns(10);
+		
+		JLabel lblAddress = new JLabel("Address");
+		lblAddress.setBounds(10, 137, 46, 14);
+		contentPane.add(lblAddress);
+		
+		JLabel lblTel = new JLabel("Tel");
+		lblTel.setBounds(10, 168, 46, 14);
+		contentPane.add(lblTel);
+		
+		JLabel lblBirth = new JLabel("Birth");
+		lblBirth.setBounds(10, 199, 46, 14);
+		contentPane.add(lblBirth);
+		
+		JLabel lblMail = new JLabel("mail");
+		lblMail.setBounds(10, 230, 46, 14);
+		contentPane.add(lblMail);
+		
+		if(prof!=1){
+			btnSave.setEnabled(false);
+			btnUpdate.setEnabled(false);
+			btnDelete.setEnabled(false);
+			btnFolderUpdate.setEnabled(false);
+			btnFolderDelete.setEnabled(false);
+			if (prof!=2){
+				btnFolderSave.setEnabled(false);
+			}
+		}
+		
 	}
 }
