@@ -15,6 +15,8 @@ import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import java.sql.*;
 import javax.swing.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class PatientInfoGUI extends JFrame {
 
@@ -41,11 +43,28 @@ public class PatientInfoGUI extends JFrame {
 	private JTextField IDtext;
 	private JTextField Nametext;
 	private JTextField Surnametext;
+	private JTextField Commenttext;
+	private JTextField Datetext;
+	private JTextField Entrytext;
 	
 	//function that uses "show info" code to refresh the table when an action is triggered
 	public void refreshTable(){
 		try {
 			String piquery="select * from PatientsInfo";
+			PreparedStatement pipst=connection.prepareStatement(piquery);
+			ResultSet pirs=pipst.executeQuery();
+			//show data on JTable
+			table.setModel(DbUtils.resultSetToTableModel(pirs));
+			pipst.close();
+			pirs.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void refreshFolderTable(){
+		try {
+			String piquery="select * from PatientFolder";
 			PreparedStatement pipst=connection.prepareStatement(piquery);
 			ResultSet pirs=pipst.executeQuery();
 			//show data on JTable
@@ -62,7 +81,7 @@ public class PatientInfoGUI extends JFrame {
 	public PatientInfoGUI() {
 		connection=sqliteConnection.dbConnector();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 635, 457);
+		setBounds(100, 100, 708, 630);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -83,7 +102,7 @@ public class PatientInfoGUI extends JFrame {
 				PatientsGUI.main(null);
 			}
 		});
-		btnLogOut.setBounds(10, 384, 89, 23);
+		btnLogOut.setBounds(10, 557, 89, 23);
 		contentPane.add(btnLogOut);
 		
 		//show patient info from the database button by executing query
@@ -103,14 +122,34 @@ public class PatientInfoGUI extends JFrame {
 				}
 			}
 		});
-		btnShowInfo.setBounds(520, 7, 89, 23);
+		btnShowInfo.setBounds(170, 7, 105, 23);
 		contentPane.add(btnShowInfo);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(170, 43, 439, 290);
+		scrollPane.setBounds(170, 43, 512, 469);
 		contentPane.add(scrollPane);
 		
 		table = new JTable();
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				try{
+					int row=table.getSelectedRow();
+					String AMKA=(table.getModel().getValueAt(row, 0)).toString();
+					String piquery="select * from PatientsInfo where ID='"+AMKA+"'";
+					PreparedStatement pipst=connection.prepareStatement(piquery);
+					ResultSet pirs=pipst.executeQuery();
+					while(pirs.next()){
+						IDtext.setText(pirs.getString("ID"));
+						Nametext.setText(pirs.getString("Name"));
+						Surnametext.setText(pirs.getString("Surname"));
+					}
+					pipst.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		});
 		scrollPane.setViewportView(table);
 		
 		JLabel lblId = new JLabel("ID");
@@ -161,7 +200,7 @@ public class PatientInfoGUI extends JFrame {
 				}
 			}
 		});
-		btnSave.setBounds(10, 350, 89, 23);
+		btnSave.setBounds(10, 523, 89, 23);
 		contentPane.add(btnSave);
 		
 		//update patient info to the database button by executing query
@@ -181,30 +220,33 @@ public class PatientInfoGUI extends JFrame {
 				}
 			}
 		});
-		btnUpdate.setBounds(109, 350, 89, 23);
+		btnUpdate.setBounds(109, 523, 89, 23);
 		contentPane.add(btnUpdate);
 		
 		//delete patient info to the database button by executing query
 		JButton btnDelete = new JButton("Delete");
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					String piquery="Delete from PatientsInfo where ID='"+IDtext.getText()+"'";
-					PreparedStatement pipst=connection.prepareStatement(piquery);
-					pipst.execute();
-					//show confirmation message
-					JOptionPane.showMessageDialog(null,"Patient Info Deleted");
-					pipst.close();
-					refreshTable();
-				} catch (Exception ex) {
-					ex.printStackTrace();
+				int action=JOptionPane.showConfirmDialog(null,"Delete confirmation","Delete",JOptionPane.YES_NO_OPTION);
+				if (action==0){
+					try {
+						String piquery="Delete from PatientsInfo where ID='"+IDtext.getText()+"'";
+						PreparedStatement pipst=connection.prepareStatement(piquery);
+						pipst.execute();
+						//show confirmation message
+						JOptionPane.showMessageDialog(null,"Patient Info Deleted");
+						pipst.close();
+						refreshTable();
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
 				}
 			}
 		});
-		btnDelete.setBounds(208, 350, 89, 23);
+		btnDelete.setBounds(208, 523, 89, 23);
 		contentPane.add(btnDelete);
 		
-		JButton btnSearch = new JButton("Search");
+		JButton btnSearch = new JButton("Search Info");
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -227,7 +269,142 @@ public class PatientInfoGUI extends JFrame {
 				}
 			}
 		});
-		btnSearch.setBounds(422, 7, 89, 23);
+		btnSearch.setBounds(285, 7, 113, 23);
 		contentPane.add(btnSearch);
+		
+		JLabel lblComment = new JLabel("Comment");
+		lblComment.setBounds(10, 495, 46, 14);
+		contentPane.add(lblComment);
+		
+		Commenttext = new JTextField();
+		Commenttext.setBounds(66, 492, 86, 20);
+		contentPane.add(Commenttext);
+		Commenttext.setColumns(10);
+		
+		Datetext = new JTextField();
+		Datetext.setText("dd/mm/yyyy");
+		Datetext.setBounds(66, 461, 86, 20);
+		contentPane.add(Datetext);
+		Datetext.setColumns(10);
+		
+		JLabel lblDate = new JLabel("Date");
+		lblDate.setBounds(10, 464, 46, 14);
+		contentPane.add(lblDate);
+		
+		JButton btnFolderSave = new JButton("Folder Save");
+		btnFolderSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					String piquery="insert into PatientFolder (Num,ID,Date,Comment) values (?,?,?,?)";
+					PreparedStatement pipst=connection.prepareStatement(piquery);
+					//read data from text fields
+					pipst.setString(1,Entrytext.getText());
+					pipst.setString(2,IDtext.getText());
+					pipst.setString(3,Datetext.getText());
+					pipst.setString(4,Commenttext.getText());
+					pipst.execute();
+					//show confirmation message
+					JOptionPane.showMessageDialog(null,"Patient Folder Info Saved");
+					pipst.close();
+					refreshFolderTable();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		btnFolderSave.setBounds(323, 523, 113, 23);
+		contentPane.add(btnFolderSave);
+		
+		JButton btnFolderUpdate = new JButton("Folder Update");
+		btnFolderUpdate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					String piquery="Update PatientFolder set ID='"+IDtext.getText()+"',Date='"+Datetext.getText()+"',Comment='"+Commenttext.getText()+"' where Num='"+Entrytext.getText()+"'";
+					PreparedStatement pipst=connection.prepareStatement(piquery);
+					pipst.execute();
+					//show confirmation message
+					JOptionPane.showMessageDialog(null,"Patient Fodler Entry Updated");
+					pipst.close();
+					refreshFolderTable();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		btnFolderUpdate.setBounds(446, 523, 113, 23);
+		contentPane.add(btnFolderUpdate);
+		
+		JButton btnShowFolder = new JButton("Show Folder");
+		btnShowFolder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					String piquery="select * from PatientFolder";
+					PreparedStatement pipst=connection.prepareStatement(piquery);
+					ResultSet pirs=pipst.executeQuery();
+					//show data on JTable
+					table.setModel(DbUtils.resultSetToTableModel(pirs));
+					pipst.close();
+					pirs.close();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		btnShowFolder.setBounds(446, 7, 113, 23);
+		contentPane.add(btnShowFolder);
+		
+		JButton btnSearchFolder = new JButton("Search Folder");
+		btnSearchFolder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					String piquery="select * from PatientFolder where ID='"+IDtext.getText()+"'";
+					PreparedStatement pipst=connection.prepareStatement(piquery);
+					ResultSet pirs=pipst.executeQuery();
+					//show data on JTable
+					table.setModel(DbUtils.resultSetToTableModel(pirs));
+					pipst.close();
+					pirs.close();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		btnSearchFolder.setBounds(569, 7, 113, 23);
+		contentPane.add(btnSearchFolder);
+		
+		JButton btnFolderDelete = new JButton("Folder Delete");
+		btnFolderDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int action=JOptionPane.showConfirmDialog(null,"Delete confirmation","Delete",JOptionPane.YES_NO_OPTION);
+				if (action==0){
+					try {
+						String piquery="Delete from PatienFolder where Num='"+Entrytext.getText()+"'";
+						PreparedStatement pipst=connection.prepareStatement(piquery);
+						pipst.execute();
+						//show confirmation message
+						JOptionPane.showMessageDialog(null,"Patient Folder Entry Deleted");
+						pipst.close();
+						refreshFolderTable();
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
+		btnFolderDelete.setBounds(569, 523, 113, 23);
+		contentPane.add(btnFolderDelete);
+		
+		Entrytext = new JTextField();
+		Entrytext.setBounds(66, 430, 86, 20);
+		contentPane.add(Entrytext);
+		Entrytext.setColumns(10);
+		
+		JLabel lblNum = new JLabel("Num");
+		lblNum.setBounds(10, 433, 46, 14);
+		contentPane.add(lblNum);
+		
+		JLabel lblPatientFolder = new JLabel("Patient Folder");
+		lblPatientFolder.setBounds(10, 405, 89, 14);
+		contentPane.add(lblPatientFolder);
 	}
 }
