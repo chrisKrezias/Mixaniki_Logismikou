@@ -46,6 +46,7 @@ public class PatientInfoGUI extends JFrame {
 	private JTextField Commenttext;
 	private JTextField Datetext;
 	private JTextField Entrytext;
+	public int indicator=0;
 	
 	//function that uses "show info" code to refresh the table when an action is triggered
 	public void refreshTable(){
@@ -57,6 +58,7 @@ public class PatientInfoGUI extends JFrame {
 			table.setModel(DbUtils.resultSetToTableModel(pirs));
 			pipst.close();
 			pirs.close();
+			indicator=0;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -71,6 +73,7 @@ public class PatientInfoGUI extends JFrame {
 			table.setModel(DbUtils.resultSetToTableModel(pirs));
 			pipst.close();
 			pirs.close();
+			indicator=1;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -117,6 +120,7 @@ public class PatientInfoGUI extends JFrame {
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					pipst.close();
 					pirs.close();
+					indicator=0;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -133,20 +137,51 @@ public class PatientInfoGUI extends JFrame {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				try{
-					int row=table.getSelectedRow();
-					String AMKA=(table.getModel().getValueAt(row, 0)).toString();
-					String piquery="select * from PatientsInfo where ID='"+AMKA+"'";
-					PreparedStatement pipst=connection.prepareStatement(piquery);
-					ResultSet pirs=pipst.executeQuery();
-					while(pirs.next()){
-						IDtext.setText(pirs.getString("ID"));
-						Nametext.setText(pirs.getString("Name"));
-						Surnametext.setText(pirs.getString("Surname"));
+				if(indicator==0){
+					try{
+						int row=table.getSelectedRow();
+						String AMKA=(table.getModel().getValueAt(row, 0)).toString();
+						String piquery="select * from PatientsInfo where ID='"+AMKA+"'";
+						PreparedStatement pipst=connection.prepareStatement(piquery);
+						ResultSet pirs=pipst.executeQuery();
+						while(pirs.next()){
+							IDtext.setText(pirs.getString("ID"));
+							Nametext.setText(pirs.getString("Name"));
+							Surnametext.setText(pirs.getString("Surname"));
+						}
+						pipst.close();
+						Entrytext.setText("");
+						Datetext.setText("dd/mm/yyyy");
+						Commenttext.setText("");
+					}catch(Exception e){
+						e.printStackTrace();
 					}
-					pipst.close();
-				}catch(Exception e){
-					e.printStackTrace();
+				}
+				else if(indicator==1){
+					try{
+						int row=table.getSelectedRow();
+						String Entry=(table.getModel().getValueAt(row, 0)).toString();
+						String piquery="select * from PatientFolder where Num='"+Entry+"'";
+						PreparedStatement pipst=connection.prepareStatement(piquery);
+						ResultSet pirs=pipst.executeQuery();
+						while(pirs.next()){
+							Entrytext.setText(pirs.getString("Num"));
+							IDtext.setText(pirs.getString("ID"));
+							Datetext.setText(pirs.getString("Date"));
+							Commenttext.setText(pirs.getString("Comment"));
+						}
+						pipst.close();
+						piquery="select * from PatientsInfo where ID='"+IDtext.getText()+"'";
+						pipst=connection.prepareStatement(piquery);
+						pirs=pipst.executeQuery();
+						while(pirs.next()){
+							Nametext.setText(pirs.getString("Name"));
+							Surnametext.setText(pirs.getString("Surname"));
+						}
+						pipst.close();
+					}catch(Exception e){
+						e.printStackTrace();
+					}
 				}
 			}
 		});
@@ -264,6 +299,7 @@ public class PatientInfoGUI extends JFrame {
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					pipst.close();
 					pirs.close();
+					indicator=0;
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
@@ -345,6 +381,7 @@ public class PatientInfoGUI extends JFrame {
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					pipst.close();
 					pirs.close();
+					indicator=1;
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
@@ -364,6 +401,7 @@ public class PatientInfoGUI extends JFrame {
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					pipst.close();
 					pirs.close();
+					indicator=1;
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
@@ -404,7 +442,28 @@ public class PatientInfoGUI extends JFrame {
 		contentPane.add(lblNum);
 		
 		JLabel lblPatientFolder = new JLabel("Patient Folder");
-		lblPatientFolder.setBounds(10, 405, 89, 14);
+		lblPatientFolder.setBounds(10, 354, 89, 14);
 		contentPane.add(lblPatientFolder);
+		
+		JLabel lblMaxNum = new JLabel("Max Num");
+		lblMaxNum.setBounds(10, 405, 54, 14);
+		contentPane.add(lblMaxNum);
+		
+		JLabel lblShownum = new JLabel("ShowNum");
+		lblShownum.setBounds(74, 405, 78, 14);
+		try {
+			String maxquery="SELECT MAX(Num) AS Max_Num FROM PatientFolder";
+			PreparedStatement maxpst=connection.prepareStatement(maxquery);
+			ResultSet maxrs=maxpst.executeQuery();
+			int id2 = -1;
+			if (maxrs.next()) {
+			   id2 = maxrs.getInt("Max_Num");  
+			}
+			lblShownum.setText(String.valueOf(id2));
+			//show confirmation message
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		contentPane.add(lblShownum);
 	}
 }
