@@ -18,8 +18,20 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class PatientInfoGUI extends JFrame {
-
+final public class PatientInfoGUI extends JFrame {
+	
+	Connection connection;
+	static JTextField IDtext;
+	static JTextField Nametext;
+	static JTextField Surnametext;
+	static JTextField Commenttext;
+	static JTextField Datetext;
+	static JTextField Entrytext;
+	public int indicator;
+	static JTextField Addresstext;
+	static JTextField Teltext;
+	static JTextField Birthtext;
+	static JTextField mailtext;
 	private JPanel contentPane;
 	private JTable table;
 
@@ -28,11 +40,11 @@ public class PatientInfoGUI extends JFrame {
 	 */
 	public int prof = PatientsGUI.profint();
 	
-	public static void main(String[] args) {
+	final public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					PatientInfoGUI frame = new PatientInfoGUI();
+					final PatientInfoGUI frame = new PatientInfoGUI();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -40,26 +52,13 @@ public class PatientInfoGUI extends JFrame {
 			}
 		});
 	}
-
-	Connection connection=null;
-	private JTextField IDtext;
-	private JTextField Nametext;
-	private JTextField Surnametext;
-	private JTextField Commenttext;
-	private JTextField Datetext;
-	private JTextField Entrytext;
-	public int indicator=0;
-	private JTextField Addresstext;
-	private JTextField Teltext;
-	private JTextField Birthtext;
-	private JTextField mailtext;
 	
 	//function that uses "show info" code to refresh the table when an action is triggered
 	public void refreshTable(){
 		try {
-			String piquery="select * from PatientsInfo";
-			PreparedStatement pipst=connection.prepareStatement(piquery);
-			ResultSet pirs=pipst.executeQuery();
+			final String piquery="select * from PatientsInfo";
+			final PreparedStatement pipst=connection.prepareStatement(piquery);
+			final ResultSet pirs=pipst.executeQuery();
 			//show data on JTable
 			table.setModel(DbUtils.resultSetToTableModel(pirs));
 			pipst.close();
@@ -72,9 +71,9 @@ public class PatientInfoGUI extends JFrame {
 	
 	public void refreshFolderTable(){
 		try {
-			String piquery="select * from PatientFolder";
-			PreparedStatement pipst=connection.prepareStatement(piquery);
-			ResultSet pirs=pipst.executeQuery();
+			final String piquery="select * from PatientFolder";
+			final PreparedStatement pipst=connection.prepareStatement(piquery);
+			final ResultSet pirs=pipst.executeQuery(); 
 			//show data on JTable
 			table.setModel(DbUtils.resultSetToTableModel(pirs));
 			pipst.close();
@@ -96,32 +95,37 @@ public class PatientInfoGUI extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JLabel PatientInfo = new JLabel("Patient Info");
+		final JLabel PatientInfo = new JLabel("Patient Info");
 		PatientInfo.setBounds(10, 11, 66, 14);
 		contentPane.add(PatientInfo);
 		
 		//log out from patient info window button
-		JButton btnLogOut = new JButton("Log Out");
+		final JButton btnLogOut = new JButton("Log Out");
 		btnLogOut.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+			final public void actionPerformed(ActionEvent arg0) {
 				//close the patient info window
 				contentPane.setVisible(false);
 				dispose();
 				//load the main application again
-				PatientsGUI.main(null);
+				//PatientsGUI.main(null);
 			}
 		});
 		btnLogOut.setBounds(10, 557, 89, 23);
 		contentPane.add(btnLogOut);
 		
 		//show patient info from the database button by executing query
-		JButton btnShowInfo = new JButton("Show Info");
+		final JButton btnShowInfo = new JButton("Show Info");
 		btnShowInfo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					String piquery="select * from PatientsInfo";
-					PreparedStatement pipst=connection.prepareStatement(piquery);
-					ResultSet pirs=pipst.executeQuery();
+			final public void actionPerformed(ActionEvent arg0) {
+				ResultSet pirs=sqliteConnection.showInfo(connection);
+				if(pirs!=null){
+					table.setModel(DbUtils.resultSetToTableModel(pirs));
+					indicator=0;
+				}
+				/* try {
+					final String piquery="select * from PatientsInfo";
+					final PreparedStatement pipst=connection.prepareStatement(piquery);
+					final ResultSet pirs=pipst.executeQuery();
 					//show data on JTable
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					pipst.close();
@@ -129,27 +133,31 @@ public class PatientInfoGUI extends JFrame {
 					indicator=0;
 				} catch (Exception e) {
 					e.printStackTrace();
-				}
+				} */
 			}
 		});
 		btnShowInfo.setBounds(170, 7, 105, 23);
 		contentPane.add(btnShowInfo);
 		
-		JScrollPane scrollPane = new JScrollPane();
+		final JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(170, 43, 512, 469);
 		contentPane.add(scrollPane);
 		
 		table = new JTable();
 		table.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				if(indicator==0){
+			final public void mouseClicked(MouseEvent arg0) {
+				int row=table.getSelectedRow();
+				String AMKA=(table.getModel().getValueAt(row, 0)).toString();
+				String Entry=(table.getModel().getValueAt(row, 0)).toString();
+				sqliteConnection.fillEntries(indicator, connection, row, AMKA, Entry, IDtext.getText());
+				/* if(indicator==0){
 					try{
-						int row=table.getSelectedRow();
-						String AMKA=(table.getModel().getValueAt(row, 0)).toString();
-						String piquery="select * from PatientsInfo where ID='"+AMKA+"'";
-						PreparedStatement pipst=connection.prepareStatement(piquery);
-						ResultSet pirs=pipst.executeQuery();
+						final int row=table.getSelectedRow();
+						final String AMKA=(table.getModel().getValueAt(row, 0)).toString();
+						final String piquery="select * from PatientsInfo where ID='"+AMKA+"'";
+						final PreparedStatement pipst=connection.prepareStatement(piquery);
+						final ResultSet pirs=pipst.executeQuery();
 						while(pirs.next()){
 							IDtext.setText(pirs.getString("ID"));
 							Nametext.setText(pirs.getString("Name"));
@@ -169,8 +177,8 @@ public class PatientInfoGUI extends JFrame {
 				}
 				else if(indicator==1){
 					try{
-						int row=table.getSelectedRow();
-						String Entry=(table.getModel().getValueAt(row, 0)).toString();
+						final int row=table.getSelectedRow();
+						final String Entry=(table.getModel().getValueAt(row, 0)).toString();
 						String piquery="select * from PatientFolder where Num='"+Entry+"'";
 						PreparedStatement pipst=connection.prepareStatement(piquery);
 						ResultSet pirs=pipst.executeQuery();
@@ -196,12 +204,12 @@ public class PatientInfoGUI extends JFrame {
 					}catch(Exception e){
 						e.printStackTrace();
 					}
-				}
+				} */
 			}
 		});
 		scrollPane.setViewportView(table);
 		
-		JLabel lblId = new JLabel("\u0391\u039C\u039A\u0391");
+		final JLabel lblId = new JLabel("\u0391\u039C\u039A\u0391");
 		lblId.setBounds(10, 44, 46, 14);
 		contentPane.add(lblId);
 		
@@ -210,7 +218,7 @@ public class PatientInfoGUI extends JFrame {
 		contentPane.add(IDtext);
 		IDtext.setColumns(10);
 		
-		JLabel lblName = new JLabel("Name");
+		final JLabel lblName = new JLabel("Name");
 		lblName.setBounds(10, 75, 46, 14);
 		contentPane.add(lblName);
 		
@@ -219,7 +227,7 @@ public class PatientInfoGUI extends JFrame {
 		contentPane.add(Nametext);
 		Nametext.setColumns(10);
 		
-		JLabel lblSurname = new JLabel("Surname");
+		final JLabel lblSurname = new JLabel("Surname");
 		lblSurname.setBounds(10, 106, 46, 14);
 		contentPane.add(lblSurname);
 		
@@ -229,12 +237,14 @@ public class PatientInfoGUI extends JFrame {
 		Surnametext.setColumns(10);
 		
 		//save patient info to the database button by executing query
-		JButton btnSave = new JButton("Save");
+		final JButton btnSave = new JButton("Save");
 		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					String piquery="insert into PatientsInfo (ID,Name,Surname,Address,Tel,Date,mail) values (?,?,?,?,?,?,?)";
-					PreparedStatement pipst=connection.prepareStatement(piquery);
+			final public void actionPerformed(ActionEvent arg0) {
+				sqliteConnection.save(connection,IDtext.getText(),Nametext.getText(),Surnametext.getText(),Addresstext.getText(),Teltext.getText(),Birthtext.getText(),mailtext.getText());
+				refreshTable();
+				/*try {
+					final String piquery="insert into PatientsInfo (ID,Name,Surname,Address,Tel,Date,mail) values (?,?,?,?,?,?,?)";
+					final PreparedStatement pipst=connection.prepareStatement(piquery);
 					//read data from text fields
 					pipst.setString(1,IDtext.getText());
 					pipst.setString(2,Nametext.getText());
@@ -250,19 +260,21 @@ public class PatientInfoGUI extends JFrame {
 					refreshTable();
 				} catch (Exception e) {
 					e.printStackTrace();
-				}
+				}*/
 			}
 		});
 		btnSave.setBounds(10, 523, 89, 23);
 		contentPane.add(btnSave);
 		
 		//update patient info to the database button by executing query
-		JButton btnUpdate = new JButton("Update");
+		final JButton btnUpdate = new JButton("Update");
 		btnUpdate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					String piquery="Update PatientsInfo set Name='"+Nametext.getText()+"',Surname='"+Surnametext.getText()+"',Address='"+Addresstext.getText()+"',Tel='"+Teltext.getText()+"',Date='"+Birthtext.getText()+"',mail='"+mailtext.getText()+"' where ID='"+IDtext.getText()+"'";
-					PreparedStatement pipst=connection.prepareStatement(piquery);
+			final public void actionPerformed(ActionEvent arg0) {
+				sqliteConnection.update(connection,IDtext.getText(),Nametext.getText(),Surnametext.getText(),Addresstext.getText(),Teltext.getText(),Birthtext.getText(),mailtext.getText());
+				refreshTable();
+				/*try {
+					final String piquery="Update PatientsInfo set Name='"+Nametext.getText()+"',Surname='"+Surnametext.getText()+"',Address='"+Addresstext.getText()+"',Tel='"+Teltext.getText()+"',Date='"+Birthtext.getText()+"',mail='"+mailtext.getText()+"' where ID='"+IDtext.getText()+"'";
+					final PreparedStatement pipst=connection.prepareStatement(piquery);
 					pipst.execute();
 					//show confirmation message
 					JOptionPane.showMessageDialog(null,"Patient Info Updated");
@@ -270,21 +282,23 @@ public class PatientInfoGUI extends JFrame {
 					refreshTable();
 				} catch (Exception e) {
 					e.printStackTrace();
-				}
+				}*/
 			}
 		});
 		btnUpdate.setBounds(109, 523, 89, 23);
 		contentPane.add(btnUpdate);
 		
 		//delete patient info to the database button by executing query
-		JButton btnDelete = new JButton("Delete");
+		final JButton btnDelete = new JButton("Delete");
 		btnDelete.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int action=JOptionPane.showConfirmDialog(null,"Delete confirmation","Delete",JOptionPane.YES_NO_OPTION);
+			final public void actionPerformed(ActionEvent e) {
+				final int action=JOptionPane.showConfirmDialog(null,"Delete confirmation","Delete",JOptionPane.YES_NO_OPTION);
 				if (action==0){
-					try {
-						String piquery="Delete from PatientsInfo where ID='"+IDtext.getText()+"'";
-						PreparedStatement pipst=connection.prepareStatement(piquery);
+					sqliteConnection.delete(connection,IDtext.getText());
+					refreshTable();
+					/*try {
+						final String piquery="Delete from PatientsInfo where ID='"+IDtext.getText()+"'";
+						final PreparedStatement pipst=connection.prepareStatement(piquery);
 						pipst.execute();
 						//show confirmation message
 						JOptionPane.showMessageDialog(null,"Patient Info Deleted");
@@ -292,17 +306,22 @@ public class PatientInfoGUI extends JFrame {
 						refreshTable();
 					} catch (Exception ex) {
 						ex.printStackTrace();
-					}
+					}*/
 				}
 			}
 		});
 		btnDelete.setBounds(208, 523, 89, 23);
 		contentPane.add(btnDelete);
 		
-		JButton btnSearch = new JButton("Search Info");
+		final JButton btnSearch = new JButton("Search Info");
 		btnSearch.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
+			final public void actionPerformed(ActionEvent e) {
+				ResultSet pirs=sqliteConnection.searchInfo(connection, IDtext.getText(), Nametext.getText(), Surnametext.getText());
+				if (pirs!=null){
+					table.setModel(DbUtils.resultSetToTableModel(pirs));
+					indicator=0;
+				}
+				/* try {
 					String piquery="select * from PatientsInfo where ID='"+IDtext.getText()+"' OR (Name='"+Nametext.getText()+"' AND Surname='"+Surnametext.getText()+"')";
 					if (IDtext.getText().isEmpty()){
 						if (Nametext.getText().isEmpty()){
@@ -311,8 +330,8 @@ public class PatientInfoGUI extends JFrame {
 							piquery="select * from PatientsInfo where Name='"+Nametext.getText()+"'";
 						}
 					}
-					PreparedStatement pipst=connection.prepareStatement(piquery);
-					ResultSet pirs=pipst.executeQuery();
+					final PreparedStatement pipst=connection.prepareStatement(piquery);
+					final ResultSet pirs=pipst.executeQuery();
 					//show data on JTable
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					pipst.close();
@@ -320,13 +339,13 @@ public class PatientInfoGUI extends JFrame {
 					indicator=0;
 				} catch (Exception ex) {
 					ex.printStackTrace();
-				}
+				} */ 
 			}
 		});
 		btnSearch.setBounds(285, 7, 113, 23);
 		contentPane.add(btnSearch);
 		
-		JLabel lblComment = new JLabel("Comment");
+		final JLabel lblComment = new JLabel("Comment");
 		lblComment.setBounds(10, 495, 46, 14);
 		contentPane.add(lblComment);
 		
@@ -341,16 +360,18 @@ public class PatientInfoGUI extends JFrame {
 		contentPane.add(Datetext);
 		Datetext.setColumns(10);
 		
-		JLabel lblDate = new JLabel("Date");
+		final JLabel lblDate = new JLabel("Date");
 		lblDate.setBounds(10, 464, 46, 14);
 		contentPane.add(lblDate);
 		
-		JButton btnFolderSave = new JButton("Folder Save");
+		final JButton btnFolderSave = new JButton("Folder Save");
 		btnFolderSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					String piquery="insert into PatientFolder (Num,ID,Date,Comment) values (?,?,?,?)";
-					PreparedStatement pipst=connection.prepareStatement(piquery);
+			final public void actionPerformed(ActionEvent arg0) {
+				sqliteConnection.folderSave(connection,Entrytext.getText(),IDtext.getText(),Datetext.getText(),Commenttext.getText());
+				refreshFolderTable();
+				/*try {
+					final String piquery="insert into PatientFolder (Num,ID,Date,Comment) values (?,?,?,?)";
+					final PreparedStatement pipst=connection.prepareStatement(piquery);
 					//read data from text fields
 					pipst.setString(1,Entrytext.getText());
 					pipst.setString(2,IDtext.getText());
@@ -363,18 +384,20 @@ public class PatientInfoGUI extends JFrame {
 					refreshFolderTable();
 				} catch (Exception e) {
 					e.printStackTrace();
-				}
+				}*/
 			}
 		});
 		btnFolderSave.setBounds(323, 523, 113, 23);
 		contentPane.add(btnFolderSave);
 		
-		JButton btnFolderUpdate = new JButton("Folder Update");
+		final JButton btnFolderUpdate = new JButton("Folder Update");
 		btnFolderUpdate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					String piquery="Update PatientFolder set ID='"+IDtext.getText()+"',Date='"+Datetext.getText()+"',Comment='"+Commenttext.getText()+"' where Num='"+Entrytext.getText()+"'";
-					PreparedStatement pipst=connection.prepareStatement(piquery);
+			final public void actionPerformed(ActionEvent e) {
+				sqliteConnection.folderUpdate(connection,Entrytext.getText(),IDtext.getText(),Datetext.getText(),Commenttext.getText());
+				refreshFolderTable();
+				/*try {
+					final String piquery="Update PatientFolder set ID='"+IDtext.getText()+"',Date='"+Datetext.getText()+"',Comment='"+Commenttext.getText()+"' where Num='"+Entrytext.getText()+"'";
+					final PreparedStatement pipst=connection.prepareStatement(piquery);
 					pipst.execute();
 					//show confirmation message
 					JOptionPane.showMessageDialog(null,"Patient Fodler Entry Updated");
@@ -382,19 +405,24 @@ public class PatientInfoGUI extends JFrame {
 					refreshFolderTable();
 				} catch (Exception ex) {
 					ex.printStackTrace();
-				}
+				}*/
 			}
 		});
 		btnFolderUpdate.setBounds(446, 523, 113, 23);
 		contentPane.add(btnFolderUpdate);
 		
-		JButton btnShowFolder = new JButton("Show Folder");
+		final JButton btnShowFolder = new JButton("Show Folder");
 		btnShowFolder.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					String piquery="select * from PatientFolder";
-					PreparedStatement pipst=connection.prepareStatement(piquery);
-					ResultSet pirs=pipst.executeQuery();
+			final public void actionPerformed(ActionEvent e) {
+				ResultSet pirs=sqliteConnection.showFolder(connection);
+				if (pirs!=null){
+					table.setModel(DbUtils.resultSetToTableModel(pirs));
+					indicator=1;
+				}
+				/* try {
+					final String piquery="select * from PatientFolder";
+					final PreparedStatement pipst=connection.prepareStatement(piquery);
+					final ResultSet pirs=pipst.executeQuery();
 					//show data on JTable
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					pipst.close();
@@ -402,19 +430,24 @@ public class PatientInfoGUI extends JFrame {
 					indicator=1;
 				} catch (Exception ex) {
 					ex.printStackTrace();
-				}
+				} */
 			}
 		});
 		btnShowFolder.setBounds(446, 7, 113, 23);
 		contentPane.add(btnShowFolder);
 		
-		JButton btnSearchFolder = new JButton("Search Folder");
+		final JButton btnSearchFolder = new JButton("Search Folder");
 		btnSearchFolder.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					String piquery="select * from PatientFolder where ID='"+IDtext.getText()+"'";
-					PreparedStatement pipst=connection.prepareStatement(piquery);
-					ResultSet pirs=pipst.executeQuery();
+			final public void actionPerformed(ActionEvent e) {
+				ResultSet pirs=sqliteConnection.searchFolder(connection, IDtext.getText());
+				if (pirs!=null){
+					table.setModel(DbUtils.resultSetToTableModel(pirs));
+					indicator=1;
+				}
+				/* try {
+					final String piquery="select * from PatientFolder where ID='"+IDtext.getText()+"'";
+					final PreparedStatement pipst=connection.prepareStatement(piquery);
+					final ResultSet pirs=pipst.executeQuery(); 
 					//show data on JTable
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					pipst.close();
@@ -422,20 +455,22 @@ public class PatientInfoGUI extends JFrame {
 					indicator=1;
 				} catch (Exception ex) {
 					ex.printStackTrace();
-				}
+				} */
 			}
 		});
 		btnSearchFolder.setBounds(569, 7, 113, 23);
 		contentPane.add(btnSearchFolder);
 		
-		JButton btnFolderDelete = new JButton("Folder Delete");
+		final JButton btnFolderDelete = new JButton("Folder Delete");
 		btnFolderDelete.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int action=JOptionPane.showConfirmDialog(null,"Delete confirmation","Delete",JOptionPane.YES_NO_OPTION);
+			final public void actionPerformed(ActionEvent e) {
+				final int action=JOptionPane.showConfirmDialog(null,"Delete confirmation","Delete",JOptionPane.YES_NO_OPTION);
 				if (action==0){
-					try {
-						String piquery="Delete from PatientFolder where Num='"+Entrytext.getText()+"'";
-						PreparedStatement pipst=connection.prepareStatement(piquery);
+					sqliteConnection.folderDelete(connection,Entrytext.getText());
+					refreshFolderTable();
+					/*try {
+						final String piquery="Delete from PatientFolder where Num='"+Entrytext.getText()+"'";
+						final PreparedStatement pipst=connection.prepareStatement(piquery);
 						pipst.execute();
 						//show confirmation message
 						JOptionPane.showMessageDialog(null,"Patient Folder Entry Deleted");
@@ -443,7 +478,7 @@ public class PatientInfoGUI extends JFrame {
 						refreshFolderTable();
 					} catch (Exception ex) {
 						ex.printStackTrace();
-					}
+					}*/
 				}
 			}
 		});
@@ -455,24 +490,24 @@ public class PatientInfoGUI extends JFrame {
 		contentPane.add(Entrytext);
 		Entrytext.setColumns(10);
 		
-		JLabel lblNum = new JLabel("Num");
+		final JLabel lblNum = new JLabel("Num");
 		lblNum.setBounds(10, 433, 46, 14);
 		contentPane.add(lblNum);
 		
-		JLabel lblPatientFolder = new JLabel("Patient Folder");
+		final JLabel lblPatientFolder = new JLabel("Patient Folder");
 		lblPatientFolder.setBounds(10, 380, 89, 14);
 		contentPane.add(lblPatientFolder);
 		
-		JLabel lblMaxNum = new JLabel("Max Num");
+		final JLabel lblMaxNum = new JLabel("Max Num");
 		lblMaxNum.setBounds(10, 405, 54, 14);
 		contentPane.add(lblMaxNum);
 		
-		JLabel lblShownum = new JLabel("ShowNum");
+		final JLabel lblShownum = new JLabel("ShowNum");
 		lblShownum.setBounds(74, 405, 78, 14);
 		try {
-			String maxquery="SELECT MAX(Num) AS Max_Num FROM PatientFolder";
-			PreparedStatement maxpst=connection.prepareStatement(maxquery);
-			ResultSet maxrs=maxpst.executeQuery();
+			final String maxquery="SELECT MAX(Num) AS Max_Num FROM PatientFolder";
+			final PreparedStatement maxpst=connection.prepareStatement(maxquery);
+			final ResultSet maxrs=maxpst.executeQuery();
 			int id2 = -1;
 			if (maxrs.next()) {
 			   id2 = maxrs.getInt("Max_Num");  
@@ -505,19 +540,19 @@ public class PatientInfoGUI extends JFrame {
 		contentPane.add(mailtext);
 		mailtext.setColumns(10);
 		
-		JLabel lblAddress = new JLabel("Address");
+		final JLabel lblAddress = new JLabel("Address");
 		lblAddress.setBounds(10, 137, 46, 14);
 		contentPane.add(lblAddress);
 		
-		JLabel lblTel = new JLabel("Tel");
+		final JLabel lblTel = new JLabel("Tel");
 		lblTel.setBounds(10, 168, 46, 14);
 		contentPane.add(lblTel);
 		
-		JLabel lblBirth = new JLabel("Birth");
+		final JLabel lblBirth = new JLabel("Birth");
 		lblBirth.setBounds(10, 199, 46, 14);
 		contentPane.add(lblBirth);
 		
-		JLabel lblMail = new JLabel("mail");
+		final JLabel lblMail = new JLabel("mail");
 		lblMail.setBounds(10, 230, 46, 14);
 		contentPane.add(lblMail);
 		
