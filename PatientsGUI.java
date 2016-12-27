@@ -7,17 +7,22 @@ import java.awt.event.ActionEvent;
 
 public class PatientsGUI {
 
-	private JFrame frame;
-	private static int prof=0;
+	private JFrame frame; //create JFrame
+	private static int prof; //mark profession
+	Connection connection=null;
+	private JTextField NameText; //Text field
+	private JPasswordField PasswordText;
 
-	/**
-	 * Launch the application.
-	 */
+	public PatientsGUI() {
+		initialize();
+		connection=sqliteConnection.dbConnector();//make connection
+	}
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					PatientsGUI window = new PatientsGUI();
+					final PatientsGUI window = new PatientsGUI();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -26,21 +31,8 @@ public class PatientsGUI {
 		});
 	}
 
-	Connection connection=null;
-	private JTextField NameText;
-	private JPasswordField PasswordText;
-	/**
-	 * Create the application.
-	 */
-	public PatientsGUI() {
-		initialize();
-		connection=sqliteConnection.dbConnector();
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
+		
 		frame = new JFrame();
 		frame.setBounds(100, 100, 141, 249);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -55,25 +47,32 @@ public class PatientsGUI {
 		PasswordLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		PasswordLabel.setBounds(20, 77, 86, 14);
 		frame.getContentPane().add(PasswordLabel);
-		
 		NameText = new JTextField();
 		NameText.setBounds(20, 36, 86, 20);
 		frame.getContentPane().add(NameText);
 		NameText.setColumns(10);
 		
-		//log in to the patient info window button by executing query that checks info to the database
-		JButton LoginButton = new JButton("Login");
+		final JButton LoginButton = new JButton("Login"); //log in to the patient info window button by executing query that checks info to the database
 		LoginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try{
+				int array[]=new int[2];
+				int count=0; //checking the database for unique, double or no info
+				array=sqliteConnection.login(connection, NameText.getText(), PasswordText.getText());
+				prof=array[0];
+				count=array[1];
+				if (count==1){
+					frame.dispose();
+					final PatientInfoGUI patientInfo=new PatientInfoGUI();
+					patientInfo.setVisible(true);
+				}
+				/* try{
 					String loginquery="select * from StaffInfo where Username=? and Password=? ";
 					PreparedStatement loginpst=connection.prepareStatement(loginquery);
 					//read info from text fields
 					loginpst.setString(1, NameText.getText());
 					loginpst.setString(2, PasswordText.getText());
-					ResultSet loginrs=loginpst.executeQuery();
-					//checking the database for unique, double or no info
-					int count=0;
+					ResultSet loginrs=loginpst.executeQuery(); 
+					int count=0; //checking the database for unique, double or no info
 					while(loginrs.next()){
 						count++;
 					}
@@ -87,7 +86,7 @@ public class PatientsGUI {
 						prof=loginrs.getInt("Prof");
 						//close main application window and open patient info window
 						frame.dispose();
-						PatientInfoGUI patientInfo=new PatientInfoGUI();
+						final PatientInfoGUI patientInfo=new PatientInfoGUI();
 						patientInfo.setVisible(true);
 					}
 					//actions for double
@@ -102,7 +101,7 @@ public class PatientsGUI {
 					loginpst.close();
 				}catch(Exception e){
 					JOptionPane.showMessageDialog(null,e);
-				}
+				} */
 			}
 		});
 		LoginButton.setBounds(20, 143, 89, 23);
@@ -123,7 +122,6 @@ public class PatientsGUI {
 	}
 
 	public static int profint() {
-		// TODO Auto-generated method stub
 		return prof;
 	}
 }
