@@ -149,10 +149,6 @@ public class sqliteConnection { 	//connect to database script
 				loginpst=connections.prepareStatement(loginquery);
 				loginrs=loginpst.executeQuery();
 				prof=loginrs.getInt("Prof");
-				//close main application window and open patient info window
-				//frame.dispose();
-				//final PatientInfoGUI patientInfo=new PatientInfoGUI();
-				//patientInfo.setVisible(true);
 			}
 			//actions for double
 			else if(count>1){
@@ -180,10 +176,6 @@ public class sqliteConnection { 	//connect to database script
 			final String piquery="select * from PatientFolder";
 			final PreparedStatement pipst=connections.prepareStatement(piquery);
 			pirs=pipst.executeQuery();
-			//show data on JTable
-			//table.setModel(DbUtils.resultSetToTableModel(pirs));
-			//pipst.close();
-			//pirs.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -198,11 +190,6 @@ public class sqliteConnection { 	//connect to database script
 			final String piquery="select * from PatientFolder where ID='"+IDtext+"'";
 			final PreparedStatement pipst=connections.prepareStatement(piquery);
 			pirs=pipst.executeQuery(); 
-			//show data on JTable
-			//table.setModel(DbUtils.resultSetToTableModel(pirs));
-			//pipst.close();
-			//pirs.close();
-			//indicator=1;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -217,11 +204,6 @@ public class sqliteConnection { 	//connect to database script
 			final String piquery="select * from PatientsInfo";
 			final PreparedStatement pipst=connections.prepareStatement(piquery);
 			pirs=pipst.executeQuery();
-			//show data on JTable
-			//table.setModel(DbUtils.resultSetToTableModel(pirs));
-			//pipst.close();
-			//pirs.close();
-			//indicator=0;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -243,11 +225,6 @@ public class sqliteConnection { 	//connect to database script
 			}
 			final PreparedStatement pipst=connection.prepareStatement(piquery);
 			pirs=pipst.executeQuery();
-			//show data on JTable
-			//table.setModel(DbUtils.resultSetToTableModel(pirs));
-			//pipst.close();
-			//pirs.close();
-			//indicator=0;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -259,8 +236,6 @@ public class sqliteConnection { 	//connect to database script
 		// TODO Auto-generated method stub
 		if(indicator==0){
 			try{
-				//final int row=table.getSelectedRow();
-				//final String AMKA=(table.getModel().getValueAt(row, 0)).toString();
 				final String piquery="select * from PatientsInfo where ID='"+AMKA+"'";
 				final PreparedStatement pipst=connections.prepareStatement(piquery);
 				final ResultSet pirs=pipst.executeQuery();
@@ -283,8 +258,6 @@ public class sqliteConnection { 	//connect to database script
 		}
 		else if(indicator==1){
 			try{
-				//final int row=table.getSelectedRow();
-				//final String Entry=(table.getModel().getValueAt(row, 0)).toString();
 				String piquery="select * from PatientFolder where Num='"+Entry+"'";
 				PreparedStatement pipst=connections.prepareStatement(piquery);
 				ResultSet pirs=pipst.executeQuery();

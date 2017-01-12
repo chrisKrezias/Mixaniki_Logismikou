@@ -65,43 +65,6 @@ public class PatientsGUI {
 					final PatientInfoGUI patientInfo=new PatientInfoGUI();
 					patientInfo.setVisible(true);
 				}
-				/* try{
-					String loginquery="select * from StaffInfo where Username=? and Password=? ";
-					PreparedStatement loginpst=connection.prepareStatement(loginquery);
-					//read info from text fields
-					loginpst.setString(1, NameText.getText());
-					loginpst.setString(2, PasswordText.getText());
-					ResultSet loginrs=loginpst.executeQuery(); 
-					int count=0; //checking the database for unique, double or no info
-					while(loginrs.next()){
-						count++;
-					}
-					//actions for unique
-					if (count==1){
-						JOptionPane.showMessageDialog(null,"Username and password is correct");
-						loginpst.close();
-						loginquery="select Prof from StaffInfo where Username='"+NameText.getText()+"' and Password='"+PasswordText.getText()+"' ";
-						loginpst=connection.prepareStatement(loginquery);
-						loginrs=loginpst.executeQuery();
-						prof=loginrs.getInt("Prof");
-						//close main application window and open patient info window
-						frame.dispose();
-						final PatientInfoGUI patientInfo=new PatientInfoGUI();
-						patientInfo.setVisible(true);
-					}
-					//actions for double
-					else if(count>1){
-						JOptionPane.showMessageDialog(null,"Duplicate username and password");
-					}
-					//action for non existent
-					else{
-						JOptionPane.showMessageDialog(null,"Username and password is not correct");
-					}
-					loginrs.close();
-					loginpst.close();
-				}catch(Exception e){
-					JOptionPane.showMessageDialog(null,e);
-				} */
 			}
 		});
 		LoginButton.setBounds(20, 143, 89, 23);

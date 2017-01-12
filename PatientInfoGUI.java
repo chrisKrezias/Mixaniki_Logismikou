@@ -122,18 +122,6 @@ final public class PatientInfoGUI extends JFrame {
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					indicator=0;
 				}
-				/* try {
-					final String piquery="select * from PatientsInfo";
-					final PreparedStatement pipst=connection.prepareStatement(piquery);
-					final ResultSet pirs=pipst.executeQuery();
-					//show data on JTable
-					table.setModel(DbUtils.resultSetToTableModel(pirs));
-					pipst.close();
-					pirs.close();
-					indicator=0;
-				} catch (Exception e) {
-					e.printStackTrace();
-				} */
 			}
 		});
 		btnShowInfo.setBounds(170, 7, 105, 23);
@@ -151,60 +139,6 @@ final public class PatientInfoGUI extends JFrame {
 				String AMKA=(table.getModel().getValueAt(row, 0)).toString();
 				String Entry=(table.getModel().getValueAt(row, 0)).toString();
 				sqliteConnection.fillEntries(indicator, connection, row, AMKA, Entry, IDtext.getText());
-				/* if(indicator==0){
-					try{
-						final int row=table.getSelectedRow();
-						final String AMKA=(table.getModel().getValueAt(row, 0)).toString();
-						final String piquery="select * from PatientsInfo where ID='"+AMKA+"'";
-						final PreparedStatement pipst=connection.prepareStatement(piquery);
-						final ResultSet pirs=pipst.executeQuery();
-						while(pirs.next()){
-							IDtext.setText(pirs.getString("ID"));
-							Nametext.setText(pirs.getString("Name"));
-							Surnametext.setText(pirs.getString("Surname"));
-							Addresstext.setText(pirs.getString("Address"));
-							Teltext.setText(pirs.getString("Tel"));
-							Birthtext.setText(pirs.getString("Date"));
-							mailtext.setText(pirs.getString("mail"));
-						}
-						pipst.close();
-						Entrytext.setText("");
-						Datetext.setText("dd/mm/yyyy");
-						Commenttext.setText("");
-					}catch(Exception e){
-						e.printStackTrace();
-					}
-				}
-				else if(indicator==1){
-					try{
-						final int row=table.getSelectedRow();
-						final String Entry=(table.getModel().getValueAt(row, 0)).toString();
-						String piquery="select * from PatientFolder where Num='"+Entry+"'";
-						PreparedStatement pipst=connection.prepareStatement(piquery);
-						ResultSet pirs=pipst.executeQuery();
-						while(pirs.next()){
-							Entrytext.setText(pirs.getString("Num"));
-							IDtext.setText(pirs.getString("ID"));
-							Datetext.setText(pirs.getString("Date"));
-							Commenttext.setText(pirs.getString("Comment"));
-						}
-						pipst.close();
-						piquery="select * from PatientsInfo where ID='"+IDtext.getText()+"'";
-						pipst=connection.prepareStatement(piquery);
-						pirs=pipst.executeQuery();
-						while(pirs.next()){
-							Nametext.setText(pirs.getString("Name"));
-							Surnametext.setText(pirs.getString("Surname"));
-							Addresstext.setText(pirs.getString("Address"));
-							Teltext.setText(pirs.getString("Tel"));
-							Birthtext.setText(pirs.getString("Date"));
-							mailtext.setText(pirs.getString("mail"));
-						}
-						pipst.close();
-					}catch(Exception e){
-						e.printStackTrace();
-					}
-				} */
 			}
 		});
 		scrollPane.setViewportView(table);
@@ -242,25 +176,6 @@ final public class PatientInfoGUI extends JFrame {
 			final public void actionPerformed(ActionEvent arg0) {
 				sqliteConnection.save(connection,IDtext.getText(),Nametext.getText(),Surnametext.getText(),Addresstext.getText(),Teltext.getText(),Birthtext.getText(),mailtext.getText());
 				refreshTable();
-				/*try {
-					final String piquery="insert into PatientsInfo (ID,Name,Surname,Address,Tel,Date,mail) values (?,?,?,?,?,?,?)";
-					final PreparedStatement pipst=connection.prepareStatement(piquery);
-					//read data from text fields
-					pipst.setString(1,IDtext.getText());
-					pipst.setString(2,Nametext.getText());
-					pipst.setString(3,Surnametext.getText());
-					pipst.setString(4,Addresstext.getText());
-					pipst.setString(5,Teltext.getText());
-					pipst.setString(6,Birthtext.getText());
-					pipst.setString(7,mailtext.getText());
-					pipst.execute();
-					//show confirmation message
-					JOptionPane.showMessageDialog(null,"Patient Info Saved");
-					pipst.close();
-					refreshTable();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}*/
 			}
 		});
 		btnSave.setBounds(10, 523, 89, 23);
@@ -272,17 +187,6 @@ final public class PatientInfoGUI extends JFrame {
 			final public void actionPerformed(ActionEvent arg0) {
 				sqliteConnection.update(connection,IDtext.getText(),Nametext.getText(),Surnametext.getText(),Addresstext.getText(),Teltext.getText(),Birthtext.getText(),mailtext.getText());
 				refreshTable();
-				/*try {
-					final String piquery="Update PatientsInfo set Name='"+Nametext.getText()+"',Surname='"+Surnametext.getText()+"',Address='"+Addresstext.getText()+"',Tel='"+Teltext.getText()+"',Date='"+Birthtext.getText()+"',mail='"+mailtext.getText()+"' where ID='"+IDtext.getText()+"'";
-					final PreparedStatement pipst=connection.prepareStatement(piquery);
-					pipst.execute();
-					//show confirmation message
-					JOptionPane.showMessageDialog(null,"Patient Info Updated");
-					pipst.close();
-					refreshTable();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}*/
 			}
 		});
 		btnUpdate.setBounds(109, 523, 89, 23);
@@ -296,17 +200,6 @@ final public class PatientInfoGUI extends JFrame {
 				if (action==0){
 					sqliteConnection.delete(connection,IDtext.getText());
 					refreshTable();
-					/*try {
-						final String piquery="Delete from PatientsInfo where ID='"+IDtext.getText()+"'";
-						final PreparedStatement pipst=connection.prepareStatement(piquery);
-						pipst.execute();
-						//show confirmation message
-						JOptionPane.showMessageDialog(null,"Patient Info Deleted");
-						pipst.close();
-						refreshTable();
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}*/
 				}
 			}
 		});
@@ -321,25 +214,6 @@ final public class PatientInfoGUI extends JFrame {
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					indicator=0;
 				}
-				/* try {
-					String piquery="select * from PatientsInfo where ID='"+IDtext.getText()+"' OR (Name='"+Nametext.getText()+"' AND Surname='"+Surnametext.getText()+"')";
-					if (IDtext.getText().isEmpty()){
-						if (Nametext.getText().isEmpty()){
-							piquery="select * from PatientsInfo where Surname='"+Surnametext.getText()+"'";
-						} else if(Surnametext.getText().isEmpty()){
-							piquery="select * from PatientsInfo where Name='"+Nametext.getText()+"'";
-						}
-					}
-					final PreparedStatement pipst=connection.prepareStatement(piquery);
-					final ResultSet pirs=pipst.executeQuery();
-					//show data on JTable
-					table.setModel(DbUtils.resultSetToTableModel(pirs));
-					pipst.close();
-					pirs.close();
-					indicator=0;
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				} */ 
 			}
 		});
 		btnSearch.setBounds(285, 7, 113, 23);
@@ -369,22 +243,6 @@ final public class PatientInfoGUI extends JFrame {
 			final public void actionPerformed(ActionEvent arg0) {
 				sqliteConnection.folderSave(connection,Entrytext.getText(),IDtext.getText(),Datetext.getText(),Commenttext.getText());
 				refreshFolderTable();
-				/*try {
-					final String piquery="insert into PatientFolder (Num,ID,Date,Comment) values (?,?,?,?)";
-					final PreparedStatement pipst=connection.prepareStatement(piquery);
-					//read data from text fields
-					pipst.setString(1,Entrytext.getText());
-					pipst.setString(2,IDtext.getText());
-					pipst.setString(3,Datetext.getText());
-					pipst.setString(4,Commenttext.getText());
-					pipst.execute();
-					//show confirmation message
-					JOptionPane.showMessageDialog(null,"Patient Folder Info Saved");
-					pipst.close();
-					refreshFolderTable();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}*/
 			}
 		});
 		btnFolderSave.setBounds(323, 523, 113, 23);
@@ -395,17 +253,6 @@ final public class PatientInfoGUI extends JFrame {
 			final public void actionPerformed(ActionEvent e) {
 				sqliteConnection.folderUpdate(connection,Entrytext.getText(),IDtext.getText(),Datetext.getText(),Commenttext.getText());
 				refreshFolderTable();
-				/*try {
-					final String piquery="Update PatientFolder set ID='"+IDtext.getText()+"',Date='"+Datetext.getText()+"',Comment='"+Commenttext.getText()+"' where Num='"+Entrytext.getText()+"'";
-					final PreparedStatement pipst=connection.prepareStatement(piquery);
-					pipst.execute();
-					//show confirmation message
-					JOptionPane.showMessageDialog(null,"Patient Fodler Entry Updated");
-					pipst.close();
-					refreshFolderTable();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}*/
 			}
 		});
 		btnFolderUpdate.setBounds(446, 523, 113, 23);
@@ -419,18 +266,6 @@ final public class PatientInfoGUI extends JFrame {
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					indicator=1;
 				}
-				/* try {
-					final String piquery="select * from PatientFolder";
-					final PreparedStatement pipst=connection.prepareStatement(piquery);
-					final ResultSet pirs=pipst.executeQuery();
-					//show data on JTable
-					table.setModel(DbUtils.resultSetToTableModel(pirs));
-					pipst.close();
-					pirs.close();
-					indicator=1;
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				} */
 			}
 		});
 		btnShowFolder.setBounds(446, 7, 113, 23);
@@ -444,18 +279,6 @@ final public class PatientInfoGUI extends JFrame {
 					table.setModel(DbUtils.resultSetToTableModel(pirs));
 					indicator=1;
 				}
-				/* try {
-					final String piquery="select * from PatientFolder where ID='"+IDtext.getText()+"'";
-					final PreparedStatement pipst=connection.prepareStatement(piquery);
-					final ResultSet pirs=pipst.executeQuery(); 
-					//show data on JTable
-					table.setModel(DbUtils.resultSetToTableModel(pirs));
-					pipst.close();
-					pirs.close();
-					indicator=1;
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				} */
 			}
 		});
 		btnSearchFolder.setBounds(569, 7, 113, 23);
@@ -468,17 +291,6 @@ final public class PatientInfoGUI extends JFrame {
 				if (action==0){
 					sqliteConnection.folderDelete(connection,Entrytext.getText());
 					refreshFolderTable();
-					/*try {
-						final String piquery="Delete from PatientFolder where Num='"+Entrytext.getText()+"'";
-						final PreparedStatement pipst=connection.prepareStatement(piquery);
-						pipst.execute();
-						//show confirmation message
-						JOptionPane.showMessageDialog(null,"Patient Folder Entry Deleted");
-						pipst.close();
-						refreshFolderTable();
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}*/
 				}
 			}
 		});
